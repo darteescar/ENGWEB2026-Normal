@@ -1,0 +1,48 @@
+services:
+  mongodb:
+    image: mongo:6
+    container_name: mongodb_livros
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - leituras-network
+    # sem ports: — MongoDB não exposto ao exterior
+
+  api:
+    build: .
+    container_name: livros_api
+    ports:
+      - "19020:19020"
+    environment:
+      - PORT=19020
+      - MONGO_URL=mongodb://mongodb:27017/leituras
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: always
+    networks:
+      - leituras-network
+
+  interface:
+    image: nginx:alpine
+    container_name: livros_interface
+    ports:
+      - "19021:80"
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+    depends_on:
+      - api
+    networks:
+      - leituras-network
+
+networks:
+  leituras-network:
+    driver: bridge
+
+volumes:
+  mongo_data:

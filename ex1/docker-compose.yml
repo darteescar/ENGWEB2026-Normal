@@ -1,0 +1,27 @@
+services:
+  mongodb:
+    image: mongo:6
+    container_name: mongodb_jogos
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build: .
+    container_name: jogos_api
+    ports:
+      - "17000:17000"
+    environment:
+      - PORT=17000
+      - MONGO_URL=mongodb://mongodb:27017/jogostabuleiro
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  mongo_data:

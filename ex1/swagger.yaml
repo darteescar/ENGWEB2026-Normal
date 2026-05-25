@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  title: Jogos de Tabuleiro API
+  version: 1.0.0
+  description: API de dados para gestão de jogos de tabuleiro
+
+servers:
+  - url: http://localhost:17000
+
+paths:
+  /jogos:
+    get:
+      summary: Lista todos os jogos (ou filtra por editora)
+      parameters:
+        - in: query
+          name: editora
+          schema:
+            type: string
+          description: Nome da editora para filtrar jogos
+      responses:
+        '200':
+          description: Lista de jogos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JogoResumo'
+    post:
+      summary: Adiciona um novo jogo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JogoInput'
+      responses:
+        '201':
+          description: Jogo criado com sucesso
+
+  /jogos/{id}:
+    get:
+      summary: Devolve todos os campos do jogo com o id indicado
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Jogo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JogoCompleto'
+        '404':
+          description: Jogo não encontrado
+    put:
+      summary: Atualiza o jogo com o id indicado
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JogoInput'
+      responses:
+        '200':
+          description: Jogo atualizado
+        '404':
+          description: Jogo não encontrado
+    delete:
+      summary: Elimina o jogo com o id indicado
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Jogo eliminado
+        '404':
+          description: Jogo não encontrado
+
+  /autores:
+    get:
+      summary: Lista de autores ordenada alfabeticamente, com os jogos de cada autor
+      responses:
+        '200':
+          description: Lista de autores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    jogos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+
+  /categorias:
+    get:
+      summary: Lista de categorias ordenada alfabeticamente, com os jogos de cada categoria
+      responses:
+        '200':
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    categoria:
+                      type: string
+                    jogos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+
+components:
+  schemas:
+    JogoResumo:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        year:
+          type: integer
+        category:
+          type: string
+        minPlayers:
+          type: integer
+
+    JogoCompleto:
+      type: object
+      properties:
+        _id:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        year:
+          type: integer
+        category:
+          type: string
+        minPlayers:
+          type: integer
+        maxPlayers:
+          type: integer
+        playingTimeMinutes:
+          type: integer
+        descriptionEN:
+          type: string
+        autores:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        editoras:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              country:
+                type: string
+        mecanicas:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        premios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              year:
+                type: integer
+
+    JogoInput:
+      type: object
+      required:
+        - id
+        - name
+        - year
+        - category
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        year:
+          type: integer
+        category:
+          type: string
+        minPlayers:
+          type: integer
+        maxPlayers:
+          type: integer
+        playingTimeMinutes:
+          type: integer
+        descriptionEN:
+          type: string
+        autores:
+          type: array
+          items:
+            type: object
+        editoras:
+          type: array
+          items:
+            type: object
+        mecanicas:
+          type: array
+          items:
+            type: object
+        premios:
+          type: array
+          items:
+            type: object
